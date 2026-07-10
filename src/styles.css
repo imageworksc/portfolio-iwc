@@ -144,8 +144,8 @@ img { max-width: 100%; }
 .iw-works { position: relative; }
 .iw-sentinel { height: 1px; width: 100%; }
 .iw-fade {
-  position: absolute; left: 0; right: 0; bottom: 0; height: 220px;
-  background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #ffffff 82%);
+  position: sticky; bottom: 0; height: 200px; margin-top: -200px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #ffffff 80%);
   pointer-events: none; z-index: 4; opacity: 1; transition: opacity .45s ease;
 }
 .iw-fade.hidden { opacity: 0; }
