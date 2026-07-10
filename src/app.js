@@ -126,13 +126,14 @@
   var videoSubs = { "Motion graphics": 1, "Logo animation": 1, "Short video": 1, "Animated ads": 1 };
 
   // Real filenames extracted from the design bundle (extensions preserved).
+  // Paths are relative to the repo root, where index.html lives.
   var imageList = [
-    "assets/works/img01.jpg", "assets/works/img02.jpg", "assets/works/img03.webp", "assets/works/img04.webp", "assets/works/img05.jpg",
-    "assets/works/img06.webp", "assets/works/img07.jpg", "assets/works/img08.jpg", "assets/works/img09.webp", "assets/works/img10.jpg",
-    "assets/works/img11.jpg", "assets/works/img12.jpg", "assets/works/img13.jpg", "assets/works/img14.jpg", "assets/works/img15.jpg",
-    "assets/works/img16.png", "assets/works/img17.jpg", "assets/works/img18.jpg", "assets/works/img19.jpg", "assets/works/img20.jpg",
-    "assets/works/img21.jpg", "assets/works/img22.webp", "assets/works/img23.jpg", "assets/works/img24.png", "assets/works/img25.jpg",
-    "assets/works/img26.webp", "assets/works/img27.webp", "assets/works/img28.jpg", "assets/works/img29.png", "assets/works/img30.jpg"
+    "src/assets/works/img01.jpg", "src/assets/works/img02.jpg", "src/assets/works/img03.webp", "src/assets/works/img04.webp", "src/assets/works/img05.jpg",
+    "src/assets/works/img06.webp", "src/assets/works/img07.jpg", "src/assets/works/img08.jpg", "src/assets/works/img09.webp", "src/assets/works/img10.jpg",
+    "src/assets/works/img11.jpg", "src/assets/works/img12.jpg", "src/assets/works/img13.jpg", "src/assets/works/img14.jpg", "src/assets/works/img15.jpg",
+    "src/assets/works/img16.png", "src/assets/works/img17.jpg", "src/assets/works/img18.jpg", "src/assets/works/img19.jpg", "src/assets/works/img20.jpg",
+    "src/assets/works/img21.jpg", "src/assets/works/img22.webp", "src/assets/works/img23.jpg", "src/assets/works/img24.png", "src/assets/works/img25.jpg",
+    "src/assets/works/img26.webp", "src/assets/works/img27.webp", "src/assets/works/img28.jpg", "src/assets/works/img29.png", "src/assets/works/img30.jpg"
   ];
 
   /* ---------- build card sets (mirrors renderVals) ---------- */
@@ -202,7 +203,7 @@
     return order.map(function (label) {
       var on = state.sub === label ? " on" : "";
       return '<button type="button" class="iw-chip' + on + '" data-sub="' + esc(label) + '">' +
-        '<img src="assets/icons/' + slug(label) + '.svg" alt="" width="14" height="14">' + esc(label) + '</button>';
+        '<img src="src/assets/icons/' + slug(label) + '.svg" alt="" width="14" height="14">' + esc(label) + '</button>';
     }).join("");
   }
 
