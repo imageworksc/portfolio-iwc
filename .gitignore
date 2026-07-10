@@ -1,0 +1,14 @@
+# Local Claude Code settings
+.claude/
+
+# Large design-compiler reference bundle (self-contained 14MB export, kept locally only)
+Image Works Portfolio.html
+
+# Dependencies / build
+node_modules/
+dist/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
