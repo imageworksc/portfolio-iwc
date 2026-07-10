@@ -9,8 +9,8 @@ templating). This repo reimplements it as plain, dependency-free **HTML + CSS + 
 ## Structure
 
 ```
+index.html          # entry point at the repo root (for static hosting / GitHub Pages)
 src/
-├── index.html      # page shell: nav, hero, filter, sections mount, CTA, footer
 ├── styles.css      # styling, hover-panel transitions, responsive breakpoints
 ├── app.js          # filter/subcategory state machine + interactive canvas dot-grid
 └── assets/
@@ -30,8 +30,10 @@ src/
 
 ## Running
 
-No build step. Open `src/index.html` in a browser, or serve the folder:
+No build step. Open `index.html` in a browser, or serve the repo root:
 
 ```bash
-cd src && python -m http.server 8000   # then visit http://localhost:8000
+python -m http.server 8000   # then visit http://localhost:8000
 ```
+
+For GitHub Pages, deploy from the repository root — `index.html` is already there.
