@@ -140,6 +140,19 @@ img { max-width: 100%; }
 .iw-card:hover .iw-panel-title { opacity: 1; transform: translateY(0); transition-delay: .06s; }
 .iw-card:hover .iw-panel-cta { opacity: 1; transform: translateY(0); transition-delay: .1s; }
 
+/* ===== PROGRESSIVE WORKS (bottom fade + reveal-on-scroll) ===== */
+.iw-works { position: relative; }
+.iw-sentinel { height: 1px; width: 100%; }
+.iw-fade {
+  position: sticky; bottom: 0; height: 200px; margin-top: -200px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #ffffff 80%);
+  pointer-events: none; z-index: 4; opacity: 1; transition: opacity .45s ease;
+}
+.iw-fade.hidden { opacity: 0; }
+@keyframes iwCardIn { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: translateY(0); } }
+.iw-card.reveal { animation: iwCardIn 1.05s cubic-bezier(.2,.75,.25,1) both; }
+@media (prefers-reduced-motion: reduce) { .iw-card.reveal { animation: none !important; } }
+
 /* ===== ENTRANCE ANIMATION ===== */
 @keyframes iwRise { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 .iwh-in > * { animation: iwRise .7s cubic-bezier(.2,.75,.25,1) both; }
