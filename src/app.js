@@ -207,33 +207,87 @@
     }).join("");
   }
 
-  function gridHTML(cards) { return cards.map(cardHTML).join(""); }
+  // Empty works shell: grid fills progressively, fade hints there's more below.
+  function worksHTML() {
+    return '<div class="iw-works">' +
+             '<div class="iw-grid"></div>' +
+             '<div class="iw-fade" data-fade></div>' +
+             '<div class="iw-sentinel" data-sentinel></div>' +
+           '</div>';
+  }
+
+  var WORKS_INITIAL = 9;   // cards on first paint (3 rows)
+  var WORKS_STEP = 9;      // cards revealed per scroll batch
+  var moreObserver = null; // watches the sentinel; torn down between renders
+
+  // Fill a works grid in batches, revealing more as the sentinel scrolls into view.
+  function setupProgressive(host, cards) {
+    if (moreObserver) { moreObserver.disconnect(); moreObserver = null; }
+    var grid = host.querySelector(".iw-grid");
+    var fade = host.querySelector("[data-fade]");
+    var sentinel = host.querySelector("[data-sentinel]");
+    if (!grid) return;
+    var shown = 0;
+    var tmp = document.createElement("div");
+
+    function appendBatch(n) {
+      var end = Math.min(shown + n, cards.length);
+      for (var i = shown; i < end; i++) {
+        tmp.innerHTML = cardHTML(cards[i]);
+        var card = tmp.firstChild;
+        card.classList.add("reveal");
+        card.style.animationDelay = (((i - shown) % WORKS_STEP) * 40) + "ms";
+        card.addEventListener("animationend", function () {
+          this.classList.remove("reveal");
+          this.style.animationDelay = "";
+        }, { once: true });
+        grid.appendChild(card);
+      }
+      shown = end;
+      if (shown >= cards.length) {
+        if (fade) fade.classList.add("hidden");
+        if (moreObserver) { moreObserver.disconnect(); moreObserver = null; }
+      }
+    }
+
+    appendBatch(WORKS_INITIAL);
+    if (shown < cards.length) {
+      if ("IntersectionObserver" in window) {
+        moreObserver = new IntersectionObserver(function (entries) {
+          for (var k = 0; k < entries.length; k++) {
+            if (entries[k].isIntersecting) { appendBatch(WORKS_STEP); break; }
+          }
+        }, { rootMargin: "0px 0px 200px 0px" });
+        moreObserver.observe(sentinel);
+      } else {
+        appendBatch(cards.length); // no IO support: show everything
+      }
+    }
+  }
 
   function renderSections() {
     var host = document.getElementById("iw-sections");
-    var f = state.filter, html = "";
+    var f = state.filter, html = "", cards;
 
-    if (f === "all") {
-      html =
-        '<section class="iw-section all enter"><div class="iw-wrap">' +
-          '<div class="iw-grid">' + gridHTML(allCards) + '</div>' +
-        '</div></section>';
-    } else if (f === "branding") {
-      var bCards = state.sub ? brandingCardsAll.filter(function (c) { return c.sub === state.sub; }) : brandingCardsAll;
+    if (f === "branding") {
+      cards = state.sub ? brandingCardsAll.filter(function (c) { return c.sub === state.sub; }) : brandingCardsAll;
       html =
         '<section class="iw-section enter"><div class="iw-wrap centered">' +
           '<p class="lead">Logos, visual identity, brand refreshes, collateral, style direction, campaign look-and-feel, and brand-focused static creative.</p>' +
           '<div class="iw-subs">' + subsHTML(brandingSubOrder) + '</div>' +
-          '<div class="iw-grid">' + gridHTML(bCards) + '</div>' +
+          worksHTML() +
         '</div></section>';
     } else if (f === "web") {
-      var wCards = state.sub ? webCardsAll.filter(function (c) { return c.sub === state.sub; }) : webCardsAll;
+      cards = state.sub ? webCardsAll.filter(function (c) { return c.sub === state.sub; }) : webCardsAll;
       html =
         '<section class="iw-section enter"><div class="iw-wrap centered">' +
           '<p class="lead">Full websites, homepage and interior designs, landing pages, UX/UI, interactive sections, website &amp; logo animations, motion graphics, short videos, and animated ads.</p>' +
           '<div class="iw-subs">' + subsHTML(webSubOrder) + '</div>' +
-          '<div class="iw-grid">' + gridHTML(wCards) + '</div>' +
+          worksHTML() +
         '</div></section>';
+    } else {
+      cards = allCards;
+      html = '<section class="iw-section all enter"><div class="iw-wrap">' + worksHTML() + '</div></section>';
     }
     host.innerHTML = html;
 
@@ -244,6 +298,8 @@
         renderSections();
       });
     });
+
+    setupProgressive(host, cards);
   }
 
   function renderPills() {
