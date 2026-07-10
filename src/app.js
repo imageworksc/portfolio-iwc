@@ -236,7 +236,7 @@
         tmp.innerHTML = cardHTML(cards[i]);
         var card = tmp.firstChild;
         card.classList.add("reveal");
-        card.style.animationDelay = (((i - shown) % WORKS_STEP) * 40) + "ms";
+        card.style.animationDelay = (((i - shown) % WORKS_STEP) * 130) + "ms";
         card.addEventListener("animationend", function () {
           this.classList.remove("reveal");
           this.style.animationDelay = "";
