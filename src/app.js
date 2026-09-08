@@ -165,10 +165,6 @@
     if (webCardsAll[i]) allCards.push(webCardsAll[i]);
   }
 
-  var brandingSubOrder = ["Logos", "Visual identity", "Brand refresh", "Collateral", "Style direction", "Campaign look"];
-  var webSubOrder = ["Websites", "Landing pages", "UX/UI", "Web animations", "Motion graphics", "Logo animation", "Short video", "Animated ads"];
-  function slug(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
-
   /* ---------- svg snippets ---------- */
   var ARROW = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>';
   var PLAY = '<svg width="20" height="20" viewBox="0 0 24 24" fill="#143C66"><path d="M7 4v16l13-8z"></path></svg>';
@@ -179,7 +175,7 @@
   };
 
   /* ---------- state ---------- */
-  var state = { filter: "all", sub: null };
+  var state = { filter: "all" };
 
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
@@ -197,14 +193,6 @@
           '<a class="iw-panel-cta" href="#">' + esc(card.cta || "View More") + ARROW + '</a>' +
         '</div>' +
       '</div>';
-  }
-
-  function subsHTML(order) {
-    return order.map(function (label) {
-      var on = state.sub === label ? " on" : "";
-      return '<button type="button" class="iw-chip' + on + '" data-sub="' + esc(label) + '">' +
-        '<img src="src/assets/icons/' + slug(label) + '.svg" alt="" width="14" height="14">' + esc(label) + '</button>';
-    }).join("");
   }
 
   // Empty works shell: grid fills progressively, fade hints there's more below.
@@ -265,39 +253,17 @@
     }
   }
 
+  // With the subcategory row gone the three tabs differ only in the cards they
+  // carry, so they share one shell.
   function renderSections() {
     var host = document.getElementById("iw-sections");
-    var f = state.filter, html = "", cards;
+    var f = state.filter;
+    var cards = f === "branding" ? brandingCardsAll
+              : f === "web" ? webCardsAll
+              : allCards;
 
-    if (f === "branding") {
-      cards = state.sub ? brandingCardsAll.filter(function (c) { return c.sub === state.sub; }) : brandingCardsAll;
-      html =
-        '<section class="iw-section enter"><div class="iw-wrap centered">' +
-          '<p class="lead">Logos, visual identity, brand refreshes, collateral, style direction, campaign look-and-feel, and brand-focused static creative.</p>' +
-          '<div class="iw-subs">' + subsHTML(brandingSubOrder) + '</div>' +
-          worksHTML() +
-        '</div></section>';
-    } else if (f === "web") {
-      cards = state.sub ? webCardsAll.filter(function (c) { return c.sub === state.sub; }) : webCardsAll;
-      html =
-        '<section class="iw-section enter"><div class="iw-wrap centered">' +
-          '<p class="lead">Full websites, homepage and interior designs, landing pages, UX/UI, interactive sections, website &amp; logo animations, motion graphics, short videos, and animated ads.</p>' +
-          '<div class="iw-subs">' + subsHTML(webSubOrder) + '</div>' +
-          worksHTML() +
-        '</div></section>';
-    } else {
-      cards = allCards;
-      html = '<section class="iw-section all enter"><div class="iw-wrap">' + worksHTML() + '</div></section>';
-    }
-    host.innerHTML = html;
-
-    host.querySelectorAll(".iw-chip").forEach(function (chip) {
-      chip.addEventListener("click", function () {
-        var label = chip.getAttribute("data-sub");
-        state.sub = state.sub === label ? null : label;
-        renderSections();
-      });
-    });
+    host.innerHTML =
+      '<section class="iw-section enter"><div class="iw-wrap">' + worksHTML() + '</div></section>';
 
     setupProgressive(host, cards);
   }
@@ -326,7 +292,6 @@
     row.querySelectorAll(".iw-tab").forEach(function (tab) {
       tab.addEventListener("click", function () {
         state.filter = tab.getAttribute("data-cat");
-        state.sub = null;
         renderPills();
         renderSections();
       });
