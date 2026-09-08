@@ -180,12 +180,34 @@
   var ARROW = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>';
   var PLAY = '<svg width="20" height="20" viewBox="0 0 24 24" fill="#143C66"><path d="M7 4v16l13-8z"></path></svg>';
 
-  /* ---------- categories ---------- */
+  /* ---------- categories ----------
+     One mark each, all drawn on the same 24px grid at the same weight: the
+     grid of panes, the palette, the screen, and a megaphone for the work that
+     runs in a feed or a paid placement. */
+  function catIcon(body) {
+    return '<svg class="iw-seg__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" ' +
+      'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ' +
+      'aria-hidden="true">' + body + '</svg>';
+  }
   var CATS = [
-    { id: "all", label: "All work" },
-    { id: "branding", label: "Branding" },
-    { id: "web", label: "Web" },
-    { id: "social", label: "Social and Ads" }
+    { id: "all", label: "All work", icon: catIcon(
+      '<rect x="3" y="3" width="7" height="7" rx="1.5"></rect>' +
+      '<rect x="14" y="3" width="7" height="7" rx="1.5"></rect>' +
+      '<rect x="3" y="14" width="7" height="7" rx="1.5"></rect>' +
+      '<rect x="14" y="14" width="7" height="7" rx="1.5"></rect>') },
+    { id: "branding", label: "Branding", icon: catIcon(
+      '<path d="M12 21a9 9 0 1 1 0-18c4.97 0 9 3.58 9 8 0 2.5-2 3.5-3.5 3.5H15a2 2 0 0 0-1.5 3.3A1.5 1.5 0 0 1 12 21z"></path>' +
+      '<circle cx="7.5" cy="10.5" r="1"></circle>' +
+      '<circle cx="12" cy="7.5" r="1"></circle>' +
+      '<circle cx="16.5" cy="10.5" r="1"></circle>') },
+    { id: "web", label: "Web", icon: catIcon(
+      '<rect x="2.5" y="4" width="19" height="14" rx="2"></rect>' +
+      '<path d="M8 21h8M12 18v3"></path>') },
+    /* A megaphone, drawn as the cone and one sound arc. It carried a handle
+       too, which at 16px only crowded the cone into half the box. */
+    { id: "social", label: "Social and Ads", icon: catIcon(
+      '<path d="M15 4.5 7 9.5H4.5A1.5 1.5 0 0 0 3 11v2a1.5 1.5 0 0 0 1.5 1.5H7l8 5z"></path>' +
+      '<path d="M18.5 9.2a4.2 4.2 0 0 1 0 5.6"></path>') }
   ];
 
   /* ---------- state ---------- */
@@ -296,7 +318,7 @@
         '<span class="iw-seg__fill" aria-hidden="true"></span>' +
         CATS.map(function (c) {
           return '<button type="button" class="iw-seg__btn" data-cat="' + c.id + '">' +
-            esc(c.label) + '</button>';
+            c.icon + '<span>' + esc(c.label) + '</span></button>';
         }).join("") +
       '</div>';
 
