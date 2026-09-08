@@ -1,6 +1,27 @@
-/* ImageWorks Creative — "Our Work" portfolio
-   Implemented from the Claude Design source "Image Works Portfolio.dc.html". */
+/* ImageWorks Creative — Portfolio
+   Implemented from the Claude Design source "Image Works Portfolio.dc.html".
 
+   The sheet runs in the order the page does, so a section here is the section
+   you are looking at on screen:
+
+     TOKENS          brand colour and the type scale
+     BASE            reset, document ground, body type
+     BUTTON          the one shared control primitive
+     PAGE WASH       the coloured ground behind the top of the document
+     HERO            headline and description
+     FILTER          the segmented control
+     SECTIONS        the shell each tab renders into
+     CARD            a work, and the panel that covers it on hover
+     PROGRESSIVE     the bottom fade and the reveal as the grid fills
+     ENTRANCE        what moves on load and on changing tab
+     CTA             the closing band
+     RESPONSIVE      the three widths where something has to give
+
+   Nothing here is written from app.js except two measurements — the position
+   and width of the filter's fill, which depend on the rendered label widths
+   and so cannot be known ahead of time. Every rule lives in this file. */
+
+/* ===== TOKENS ===== */
 :root {
   --navy: #143C66;
   --navy-deep: #0F2E4F;
@@ -22,6 +43,7 @@
   --step-sm: 14px;                               /* chips, labels, small ui */
 }
 
+/* ===== BASE ===== */
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 /* The white belongs to the root, not to the body: a background on the body is
@@ -48,10 +70,8 @@ img { max-width: 100%; }
 }
 .iw-btn:hover { filter: brightness(1.06); transform: translateY(-1px); }
 
-/* ===== HERO ===== */
-.iw-hero { position: relative; }
-
-/* ---- the ground, carried over from the branding page ----
+/* ===== PAGE WASH =====
+   The ground, carried over from the branding page.
    One element per wash, moved by transform: separate clocks and separate
    directions, so they drift apart and come back together rather than sliding
    as one sheet. Pale on purpose — on a light ground anything stronger stops
@@ -135,10 +155,12 @@ img { max-width: 100%; }
   .page-wash span, .page-wash::after { animation: none !important; }
 }
 
-/* The nav used to hold 72px above the headline. With it gone the hero opens
+/* ===== HERO =====
+   The nav used to hold 72px above the headline. With it gone the hero opens
    the document, so it takes that room back as padding of its own. */
+.iw-hero { position: relative; }
 .iw-hero .inner {
-  position: relative; z-index: 2; padding: clamp(72px, 9vw, 116px) 24px 56px;
+  position: relative; z-index: 2; padding: clamp(72px, 9vw, 116px) 24px 32px;
   display: flex; flex-direction: column; align-items: center; text-align: center;
 }
 /* Set as the branding page sets its hero: the same clamp, leading and
@@ -163,10 +185,11 @@ img { max-width: 100%; }
    Four segments in one track, with a single fill that slides to whichever is
    chosen. The fill is placed from measurement in app.js, because the labels
    are different lengths and no stylesheet can know where it belongs. */
-/* Sits closer to the hero than it did, and holds more room under it: the
-   control reads as the head of the grid rather than as something floating
-   between the two. The section below adds 24px of its own. */
-.iw-filter { padding: 26px 16px 36px; }
+/* Close under the copy and well clear of the grid, so it reads as the head of
+   the work rather than as something floating between the two. The gap above is
+   this padding plus the hero's own foot; the one below adds the section's
+   24px. */
+.iw-filter { padding: 8px 16px 36px; }
 .iw-filter-row { display: flex; justify-content: center; }
 
 .iw-seg {
@@ -300,6 +323,19 @@ img { max-width: 100%; }
 .iw-fade.hidden { opacity: 0; }
 @keyframes iwCardIn { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: translateY(0); } }
 .iw-card.reveal { animation: iwCardIn 1.05s cubic-bezier(.2,.75,.25,1) both; }
+/* The stagger, held here rather than written onto each card from app.js. The
+   grid fills in batches of nine (WORKS_STEP), so a card's place in its batch
+   is its place in the grid counted in nines — which is what nth-child says.
+   Change that batch size and these nine steps have to follow. */
+.iw-card.reveal:nth-child(9n+1) { animation-delay: 0ms; }
+.iw-card.reveal:nth-child(9n+2) { animation-delay: 130ms; }
+.iw-card.reveal:nth-child(9n+3) { animation-delay: 260ms; }
+.iw-card.reveal:nth-child(9n+4) { animation-delay: 390ms; }
+.iw-card.reveal:nth-child(9n+5) { animation-delay: 520ms; }
+.iw-card.reveal:nth-child(9n+6) { animation-delay: 650ms; }
+.iw-card.reveal:nth-child(9n+7) { animation-delay: 780ms; }
+.iw-card.reveal:nth-child(9n+8) { animation-delay: 910ms; }
+.iw-card.reveal:nth-child(9n+9) { animation-delay: 1040ms; }
 @media (prefers-reduced-motion: reduce) { .iw-card.reveal { animation: none !important; } }
 
 /* ===== ENTRANCE ANIMATION ===== */
