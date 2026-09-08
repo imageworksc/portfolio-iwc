@@ -1,6 +1,6 @@
 /* ImageWorks Creative — Portfolio
    Vanilla-JS reimplementation of the Design Compiler logic in
-   "Image Works Portfolio.dc.html" (state machine + interactive canvas grids).
+   "Image Works Portfolio.dc.html" (the filter state machine and the grid).
 
    Read top to bottom; each part only needs the one above it:
 
@@ -13,7 +13,6 @@
      PROGRESSIVE   filling the grid in batches as the sentinel comes into view
      SECTIONS      rendering the shell for the chosen filter
      FILTER        building the segmented control, and placing its fill
-     DOT GRID      the canvas behind the closing band
      BOOT
 
    No styling is written from here. The two properties app.js does set on an
@@ -408,73 +407,10 @@
     }
   }
 
-  /* ---------- interactive dot grid (hero + CTA) ---------- */
-  function initGrid(host) {
-    const cv = host.querySelector("canvas");
-    if (!cv) return;
-    const ctx = cv.getContext("2d");
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const GAP = 24;      // the branding page's dot field pitch
-    const R = 190;       // how far the cursor reaches
-    const MAXPUSH = 30;  // how far a dot is pushed at the centre of that reach
-    let w = 0, h = 0, mx = -9999, my = -9999, strength = 0, target = 0;
-
-    function resize() {
-      const r = host.getBoundingClientRect();
-      w = r.width; h = r.height;
-      cv.width = Math.round(w * dpr);
-      cv.height = Math.round(h * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-    function draw() {
-      ctx.clearRect(0, 0, w, h);
-      for (let y = GAP / 2; y < h; y += GAP) {
-        for (let x = GAP / 2; x < w; x += GAP) {
-          let px = x, py = y, ff = 0;
-          if (strength > 0.01) {
-            const dx = x - mx, dy = y - my, d = Math.hypot(dx, dy);
-            if (d < R) {
-              ff = 1 - d / R;
-              const inv = d || 1, push = ff * MAXPUSH * strength;
-              px = x + (dx / inv) * push;
-              py = y + (dy / inv) * push;
-            }
-          }
-          // At rest this is the branding page's dot field exactly — white at
-          // .07, a 1px dot every 24px. The dots were navy on white before the
-          // band took its gradient, and would have been invisible on it. Near
-          // the cursor they brighten and swell; that part is this page's own.
-          const e = ff * strength;
-          const eased = e * e * (3 - 2 * e);
-          ctx.beginPath();
-          ctx.fillStyle = "rgba(255,255,255," + (0.07 + eased * 0.25) + ")";
-          ctx.arc(px, py, 1 + eased * 0.9, 0, 6.2832);
-          ctx.fill();
-        }
-      }
-    }
-    host.addEventListener("mousemove", function (ev) {
-      const r = host.getBoundingClientRect();
-      mx = ev.clientX - r.left; my = ev.clientY - r.top; target = 1;
-    }, { passive: true });
-    host.addEventListener("mouseleave", function () { target = 0; }, { passive: true });
-    window.addEventListener("resize", resize, { passive: true });
-    resize();
-    // Runs for the life of the page; the frame id was kept only to be
-    // discarded, since nothing ever cancels it.
-    const loop = () => {
-      strength += (target - strength) * 0.08;
-      draw();
-      requestAnimationFrame(loop);
-    };
-    loop();
-  }
-
   /* ---------- boot ---------- */
   function boot() {
     buildPills();
     renderSections();
-    document.querySelectorAll("[data-dotgrid]").forEach(initGrid);
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
