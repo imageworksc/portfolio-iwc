@@ -300,10 +300,19 @@ img { max-width: 100%; }
 }
 .iw-card:hover .iw-play { transform: translate(-50%,-50%) scale(1.08); }
 
+/* The panel is the brand navy rather than white. On white the copy sat at the
+   mercy of whatever was underneath — a pale mockup left dark text on a nearly
+   white ground — and the shadows behind every letter were there to rescue it.
+   Navy at .82 fixes the ground instead: against the worst case, an all-white
+   image, it still resolves to about #436385, which carries white text at 6:1.
+   So the text is plain white and the shadows are gone.
+
+   The blur stays; the saturate(0.45) it used to carry does not, since the
+   image behind is already turned to greyscale on the same hover. */
 .iw-panel {
   position: absolute; inset: 0; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
-  text-align: left; padding: 26px; background: rgba(255,255,255,0.65);
-  backdrop-filter: blur(7px) saturate(0.45); -webkit-backdrop-filter: blur(7px) saturate(0.45);
+  text-align: left; padding: 26px; background: rgba(20,60,102,0.82);
+  backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px);
   transform: scale(0.86); opacity: 0;
   transition: transform .25s cubic-bezier(.2,.8,.3,1), opacity .18s ease;
 }
@@ -311,9 +320,11 @@ img { max-width: 100%; }
 .iw-panel-title, .iw-panel-cta { opacity: 0; transform: translateY(8px); transition: opacity .2s ease, transform .25s cubic-bezier(.2,.8,.3,1); }
 /* An item head over its link, at the sizes the branding page sets for the
    same pair: 20px with -.3px of tracking, and 14px for the arrow link. */
-.iw-panel-title { font-weight: 700; font-size: 20px; line-height: 1.25; letter-spacing: -0.3px; color: var(--navy-deep); text-shadow: 0 1px 4px rgba(255,255,255,0.9); }
-.iw-panel-cta { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; margin-top: 14px; font-weight: 700; font-size: var(--step-sm); letter-spacing: 0.2px; color: #2A3A4A; text-shadow: 0 1px 3px rgba(255,255,255,0.85); }
-.iw-panel-cta:hover { color: var(--green-dark); }
+.iw-panel-title { font-weight: 700; font-size: 20px; line-height: 1.25; letter-spacing: -0.3px; color: #fff; }
+.iw-panel-cta { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; margin-top: 14px; font-weight: 700; font-size: var(--step-sm); letter-spacing: 0.2px; color: #fff; }
+/* The link's hover was the darker green, which was legible on white and is
+   not on navy. The brand green is, at 5.2:1. */
+.iw-panel-cta:hover { color: var(--green); }
 .iw-card:hover .iw-panel-title { opacity: 1; transform: translateY(0); transition-delay: .06s; }
 .iw-card:hover .iw-panel-cta { opacity: 1; transform: translateY(0); transition-delay: .1s; }
 
