@@ -414,7 +414,9 @@
     if (!cv) return;
     const ctx = cv.getContext("2d");
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const GAP = 30, R = 190, MAXPUSH = 30;
+    const GAP = 24;      // the branding page's dot field pitch
+    const R = 190;       // how far the cursor reaches
+    const MAXPUSH = 30;  // how far a dot is pushed at the centre of that reach
     let w = 0, h = 0, mx = -9999, my = -9999, strength = 0, target = 0;
 
     function resize() {
@@ -438,14 +440,15 @@
               py = y + (dy / inv) * push;
             }
           }
+          // At rest this is the branding page's dot field exactly — white at
+          // .07, a 1px dot every 24px. The dots were navy on white before the
+          // band took its gradient, and would have been invisible on it. Near
+          // the cursor they brighten and swell; that part is this page's own.
           const e = ff * strength;
           const eased = e * e * (3 - 2 * e);
-          const cr = (52 + 76 * eased) | 0;
-          const cg = (92 + 103 * eased) | 0;
-          const cb = (134 - 60 * eased) | 0;
           ctx.beginPath();
-          ctx.fillStyle = "rgba(" + cr + "," + cg + "," + cb + "," + (0.16 + eased * 0.3) + ")";
-          ctx.arc(px, py, Math.max(1.0, 1.9 - eased * 0.9), 0, 6.2832);
+          ctx.fillStyle = "rgba(255,255,255," + (0.07 + eased * 0.25) + ")";
+          ctx.arc(px, py, 1 + eased * 0.9, 0, 6.2832);
           ctx.fill();
         }
       }
