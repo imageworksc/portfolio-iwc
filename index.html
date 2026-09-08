@@ -13,14 +13,20 @@
        the other. When markup and CSS change together — a renamed class, say —
        ten minutes of that mismatch renders the page unstyled. Bump ?v= with any
        change that markup and CSS have to make in step. -->
-  <link rel="stylesheet" href="src/styles.css?v=6">
+  <link rel="stylesheet" href="css/styles.css?v=7">
 </head>
 <body>
 
-  <!-- The page's ground, taken from the branding page: three washes of brand
-       colour, each on its own heading and its own clock. It sits behind the
-       whole top of the page rather than inside the hero, so the colour carries
-       on past the fold into the work instead of stopping at an edge. -->
+  <!-- Structure, in order: the wash behind the top of the page, the hero, the
+       filter, the grid the filter fills, and the closing band. The filter and
+       the grid are empty here and built by js/app.js; everything else is
+       markup. No styling lives in this file — it is all in css/styles.css. -->
+
+  <!-- ===== PAGE WASH =====
+       The ground, taken from the branding page: three washes of brand colour,
+       each on its own heading and its own clock. It sits behind the whole top
+       of the page rather than inside the hero, so the colour carries on past
+       the fold into the work instead of stopping at an edge. -->
   <div class="page-wash" aria-hidden="true">
     <span class="page-wash__g"></span>
     <span class="page-wash__b"></span>
@@ -40,7 +46,7 @@
     <div class="iw-filter-row" id="iw-filter-row"></div>
   </div>
 
-  <!-- ===== SECTIONS (rendered by app.js) ===== -->
+  <!-- ===== WORK GRID (rendered by app.js) ===== -->
   <main id="iw-sections"></main>
 
   <!-- ===== CTA ===== -->
@@ -54,6 +60,6 @@
     </div>
   </section>
 
-  <script src="src/app.js?v=6"></script>
+  <script src="js/app.js?v=7"></script>
 </body>
 </html>

@@ -1,6 +1,25 @@
-/* ImageWorks Creative — "Our Work"
+/* ImageWorks Creative — Portfolio
    Vanilla-JS reimplementation of the Design Compiler logic in
-   "Image Works Portfolio.dc.html" (state machine + interactive canvas grids). */
+   "Image Works Portfolio.dc.html" (state machine + interactive canvas grids).
+
+   Read top to bottom; each part only needs the one above it:
+
+     DATA          the three sets of work, and the image list they draw from
+     CARD SETS     those turned into card objects, and interleaved for "all"
+     SVG           the two marks that go inside a card
+     CATEGORIES    the four filters and their marks
+     STATE         one field: which filter is showing
+     CARD / SHELL  the markup for a card and for the section around the grid
+     PROGRESSIVE   filling the grid in batches as the sentinel comes into view
+     SECTIONS      rendering the shell for the chosen filter
+     FILTER        building the segmented control, and placing its fill
+     DOT GRID      the canvas behind the closing band
+     BOOT
+
+   No styling is written from here. The two properties app.js does set on an
+   element are measurements — where the filter's fill goes and how wide it is,
+   which depend on rendered label widths and cannot be known ahead of time.
+   What those numbers do is decided in css/styles.css. */
 (function () {
   "use strict";
 
@@ -134,12 +153,12 @@
   // Real filenames extracted from the design bundle (extensions preserved).
   // Paths are relative to the repo root, where index.html lives.
   var imageList = [
-    "src/assets/works/img01.jpg", "src/assets/works/img02.jpg", "src/assets/works/img03.webp", "src/assets/works/img04.webp", "src/assets/works/img05.jpg",
-    "src/assets/works/img06.webp", "src/assets/works/img07.jpg", "src/assets/works/img08.jpg", "src/assets/works/img09.webp", "src/assets/works/img10.jpg",
-    "src/assets/works/img11.jpg", "src/assets/works/img12.jpg", "src/assets/works/img13.jpg", "src/assets/works/img14.jpg", "src/assets/works/img15.jpg",
-    "src/assets/works/img16.png", "src/assets/works/img17.jpg", "src/assets/works/img18.jpg", "src/assets/works/img19.jpg", "src/assets/works/img20.jpg",
-    "src/assets/works/img21.jpg", "src/assets/works/img22.webp", "src/assets/works/img23.jpg", "src/assets/works/img24.png", "src/assets/works/img25.jpg",
-    "src/assets/works/img26.webp", "src/assets/works/img27.webp", "src/assets/works/img28.jpg", "src/assets/works/img29.png", "src/assets/works/img30.jpg"
+    "assets/works/img01.jpg", "assets/works/img02.jpg", "assets/works/img03.webp", "assets/works/img04.webp", "assets/works/img05.jpg",
+    "assets/works/img06.webp", "assets/works/img07.jpg", "assets/works/img08.jpg", "assets/works/img09.webp", "assets/works/img10.jpg",
+    "assets/works/img11.jpg", "assets/works/img12.jpg", "assets/works/img13.jpg", "assets/works/img14.jpg", "assets/works/img15.jpg",
+    "assets/works/img16.png", "assets/works/img17.jpg", "assets/works/img18.jpg", "assets/works/img19.jpg", "assets/works/img20.jpg",
+    "assets/works/img21.jpg", "assets/works/img22.webp", "assets/works/img23.jpg", "assets/works/img24.png", "assets/works/img25.jpg",
+    "assets/works/img26.webp", "assets/works/img27.webp", "assets/works/img28.jpg", "assets/works/img29.png", "assets/works/img30.jpg"
   ];
 
   /* ---------- build card sets (mirrors renderVals) ---------- */
@@ -241,7 +260,8 @@
   }
 
   var WORKS_INITIAL = 9;   // cards on first paint (3 rows)
-  var WORKS_STEP = 9;      // cards revealed per scroll batch
+  var WORKS_STEP = 9;      // cards revealed per scroll batch — the stylesheet
+                           // staggers the reveal off this, in .iw-card.reveal
   var moreObserver = null; // watches the sentinel; torn down between renders
 
   // Fill a works grid in batches, revealing more as the sentinel scrolls into view.
@@ -259,11 +279,12 @@
       for (var i = shown; i < end; i++) {
         tmp.innerHTML = cardHTML(cards[i]);
         var card = tmp.firstChild;
+        // The stagger within a batch is the stylesheet's, off :nth-child —
+        // every batch is WORKS_STEP long, so a card's place in its batch is
+        // its place in the grid, counted in nines.
         card.classList.add("reveal");
-        card.style.animationDelay = (((i - shown) % WORKS_STEP) * 130) + "ms";
         card.addEventListener("animationend", function () {
           this.classList.remove("reveal");
-          this.style.animationDelay = "";
         }, { once: true });
         grid.appendChild(card);
       }
