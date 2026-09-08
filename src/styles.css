@@ -160,7 +160,10 @@ img { max-width: 100%; }
    Four segments in one track, with a single fill that slides to whichever is
    chosen. The fill is placed from measurement in app.js, because the labels
    are different lengths and no stylesheet can know where it belongs. */
-.iw-filter { padding: 44px 16px 8px; }
+/* Sits closer to the hero than it did, and holds more room under it: the
+   control reads as the head of the grid rather than as something floating
+   between the two. The section below adds 24px of its own. */
+.iw-filter { padding: 26px 16px 36px; }
 .iw-filter-row { display: flex; justify-content: center; }
 
 .iw-seg {
@@ -192,11 +195,15 @@ img { max-width: 100%; }
 
 .iw-seg__btn {
   position: relative; z-index: 1; flex: 0 0 auto;
+  display: inline-flex; align-items: center; gap: 8px;
   appearance: none; -webkit-appearance: none; border: 0; background: transparent;
-  height: 44px; padding: 0 22px; border-radius: 10px; cursor: pointer;
+  height: 44px; padding: 0 20px; border-radius: 10px; cursor: pointer;
   font: inherit; font-size: 15px; font-weight: 600; white-space: nowrap;
   color: var(--muted); transition: color .3s ease;
 }
+/* The mark takes the label's colour, so it turns with it when the fill
+   arrives underneath. */
+.iw-seg__icon { display: block; flex-shrink: 0; }
 .iw-seg__btn:hover { color: var(--navy); }
 /* Until app.js has measured, the fill has no width: the active label stays
    navy so it is never white on nothing. */
@@ -338,12 +345,14 @@ img { max-width: 100%; }
   .iw-foot-menus { grid-template-columns: 1fr 1fr; }
   .iw-cta h2 { font-size: 30px; line-height: 1.15; }
 }
-@media (max-width: 560px) {
+@media (max-width: 700px) {
   /* Four segments in one track: tighten them so the whole control still fits a
      phone. "Social and Ads" is the one that decides it — the other three are
-     short. Below the narrowest of these the track scrolls sideways on its own
-     rather than breaking into two rows, which the sliding fill could not
-     follow. */
+     short. The marks go first, since each costs 24px of a width the labels
+     need more; the labels alone still name the categories. Below the narrowest
+     of these the track scrolls sideways on its own rather than breaking into
+     two rows, which the sliding fill could not follow. */
+  .iw-seg__icon { display: none; }
   .iw-seg__btn { height: 40px; padding: 0 14px; font-size: 13.5px; }
 }
 @media (max-width: 420px) {
