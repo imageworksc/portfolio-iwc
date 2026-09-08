@@ -438,15 +438,6 @@
     buildPills();
     renderSections();
     document.querySelectorAll("[data-dotgrid]").forEach(initGrid);
-
-    var toggle = document.querySelector(".nav-toggle");
-    var nav = document.querySelector(".iw-nav nav");
-    if (toggle && nav) {
-      toggle.addEventListener("click", function () {
-        var open = nav.style.display === "flex";
-        nav.style.display = open ? "" : "flex";
-      });
-    }
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
