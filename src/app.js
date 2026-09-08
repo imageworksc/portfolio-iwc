@@ -104,7 +104,13 @@
       ["Broadcast bumper", "Logo bumper for video content."],
       ["Endcard animation", "Animated logo endcard for ads."],
       ["Mascot reveal", "Animated brand mascot reveal."]
-    ],
+    ]
+  };
+
+  // Social and ads: the work that runs in a feed or a placement rather than on
+  // a site of its own. Split out of the web set, which keeps sites, landing
+  // pages, UX/UI and the animation work.
+  var socialData = {
     "Short video": [
       ["Short-form social video", "Edited promo reel with motion titles."],
       ["Testimonial edit", "Customer testimonial video edit."],
@@ -137,42 +143,50 @@
   ];
 
   /* ---------- build card sets (mirrors renderVals) ---------- */
-  var brandingCardsAll = [];
-  Object.keys(brandingData).forEach(function (s) {
-    brandingData[s].forEach(function (p) {
-      brandingCardsAll.push({ sub: s, title: p[0], desc: p[1], img: true, play: false, cta: "View project" });
+  function buildCards(data) {
+    var out = [];
+    Object.keys(data).forEach(function (s) {
+      data[s].forEach(function (p) {
+        var play = !!videoSubs[s];
+        out.push({ sub: s, title: p[0], desc: p[1], img: !play, play: play, cta: play ? "Watch video" : "View project" });
+      });
     });
-  });
-  var webCardsAll = [];
-  Object.keys(webData).forEach(function (s) {
-    webData[s].forEach(function (p) {
-      var play = !!videoSubs[s];
-      webCardsAll.push({ sub: s, title: p[0], desc: p[1], img: !play, play: play, cta: play ? "Watch video" : "View project" });
-    });
-  });
+    return out;
+  }
+  var brandingCardsAll = buildCards(brandingData);
+  var webCardsAll = buildCards(webData);
+  var socialCardsAll = buildCards(socialData);
 
-  // Scatter images so neighbours differ — identical formula to the source.
+  // Scatter images so neighbours differ — identical formula to the source, and
+  // walked in the same order, so splitting the social work off the web set left
+  // every card with the image it already had.
   var _gi = 0;
   function assignImg(c) { c.image = imageList[(_gi * 7 + 3) % imageList.length]; _gi++; return c; }
   brandingCardsAll.forEach(assignImg);
   webCardsAll.forEach(assignImg);
+  socialCardsAll.forEach(assignImg);
 
-  // Interleave both lists into one ungrouped grid.
+  // Interleave the three lists into one ungrouped grid.
   var allCards = [];
-  var maxLen = Math.max(brandingCardsAll.length, webCardsAll.length);
+  var sets = [brandingCardsAll, webCardsAll, socialCardsAll];
+  var maxLen = Math.max(brandingCardsAll.length, webCardsAll.length, socialCardsAll.length);
   for (var i = 0; i < maxLen; i++) {
-    if (brandingCardsAll[i]) allCards.push(brandingCardsAll[i]);
-    if (webCardsAll[i]) allCards.push(webCardsAll[i]);
+    for (var k = 0; k < sets.length; k++) {
+      if (sets[k][i]) allCards.push(sets[k][i]);
+    }
   }
 
   /* ---------- svg snippets ---------- */
   var ARROW = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>';
   var PLAY = '<svg width="20" height="20" viewBox="0 0 24 24" fill="#143C66"><path d="M7 4v16l13-8z"></path></svg>';
-  var CAT_ICONS = {
-    all: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>',
-    branding: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 1 0-18c4.97 0 9 3.58 9 8 0 2.5-2 3.5-3.5 3.5H15a2 2 0 0 0-1.5 3.3A1.5 1.5 0 0 1 12 21z"></path><circle cx="7.5" cy="10.5" r="1"></circle><circle cx="12" cy="7.5" r="1"></circle><circle cx="16.5" cy="10.5" r="1"></circle></svg>',
-    web: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="14" rx="2"></rect><path d="M8 21h8M12 18v3"></path></svg>'
-  };
+
+  /* ---------- categories ---------- */
+  var CATS = [
+    { id: "all", label: "All work" },
+    { id: "branding", label: "Branding" },
+    { id: "web", label: "Web" },
+    { id: "social", label: "Social and Ads" }
+  ];
 
   /* ---------- state ---------- */
   var state = { filter: "all" };
@@ -253,13 +267,13 @@
     }
   }
 
-  // With the subcategory row gone the three tabs differ only in the cards they
-  // carry, so they share one shell.
+  // The tabs differ only in the cards they carry, so they share one shell.
   function renderSections() {
     var host = document.getElementById("iw-sections");
     var f = state.filter;
     var cards = f === "branding" ? brandingCardsAll
               : f === "web" ? webCardsAll
+              : f === "social" ? socialCardsAll
               : allCards;
 
     host.innerHTML =
@@ -268,34 +282,80 @@
     setupProgressive(host, cards);
   }
 
-  function renderPills() {
+  /* ---------- filter: a segmented control ----------
+     Built once and then only re-marked, so the fill slides from one segment to
+     the next instead of being thrown away and redrawn in place. */
+  var segEl = null, segBtns = [];
+
+  function buildPills() {
     var row = document.getElementById("iw-filter-row");
-    var f = state.filter;
-    var cats = [
-      { id: "all", label: "All work", icon: CAT_ICONS.all },
-      { id: "branding", label: "Branding", icon: CAT_ICONS.branding },
-      { id: "web", label: "Web &amp; Animations", icon: CAT_ICONS.web }
-    ];
-    // Selected pill sits in the middle (order 2); others take 1 and 3.
-    var others = cats.filter(function (c) { return c.id !== f; });
-    var orderOf = {};
-    orderOf[f] = 2;
-    if (others[0]) orderOf[others[0].id] = 1;
-    if (others[1]) orderOf[others[1].id] = 3;
+    if (!row) return;
 
-    row.innerHTML = cats.map(function (c) {
-      var on = c.id === f;
-      return '<button type="button" class="iw-tab ' + (on ? "on" : "off") + '" data-cat="' + c.id + '" style="order:' + orderOf[c.id] + '">' +
-        c.icon + '<span>' + c.label + '</span></button>';
-    }).join("");
+    row.innerHTML =
+      '<div class="iw-seg" role="group" aria-label="Filter work by category">' +
+        '<span class="iw-seg__fill" aria-hidden="true"></span>' +
+        CATS.map(function (c) {
+          return '<button type="button" class="iw-seg__btn" data-cat="' + c.id + '">' +
+            esc(c.label) + '</button>';
+        }).join("") +
+      '</div>';
 
-    row.querySelectorAll(".iw-tab").forEach(function (tab) {
-      tab.addEventListener("click", function () {
-        state.filter = tab.getAttribute("data-cat");
-        renderPills();
+    segEl = row.querySelector(".iw-seg");
+    segBtns = Array.prototype.slice.call(row.querySelectorAll(".iw-seg__btn"));
+
+    segBtns.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var id = btn.getAttribute("data-cat");
+        if (id === state.filter) return;
+        state.filter = id;
+        markPills();
         renderSections();
       });
     });
+
+    markPills();
+    window.addEventListener("resize", moveFill, { passive: true });
+
+    // The labels are set in a web font, and the first measurement happens
+    // before it lands: the segments are still at the fallback's widths, and the
+    // fill would be cut to those and never correct itself. Watching the
+    // segments catches the reflow when the font arrives — document.fonts.ready
+    // does not, since it can resolve before the face is even requested.
+    if (window.ResizeObserver) {
+      var ro = new ResizeObserver(moveFill);
+      ro.observe(segEl);
+      segBtns.forEach(function (b) { ro.observe(b); });
+    } else if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(moveFill);
+    }
+  }
+
+  function markPills() {
+    segBtns.forEach(function (btn) {
+      var on = btn.getAttribute("data-cat") === state.filter;
+      btn.classList.toggle("is-on", on);
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    moveFill();
+  }
+
+  // The fill is laid over the active segment from measurement, not from a
+  // width the stylesheet could know: the labels are different lengths.
+  function moveFill() {
+    if (!segEl) return;
+    var on = segEl.querySelector(".iw-seg__btn.is-on");
+    if (!on) return;
+    segEl.style.setProperty("--fill-x", on.offsetLeft + "px");
+    segEl.style.setProperty("--fill-w", on.offsetWidth + "px");
+    // Until this runs the active label would be white on nothing, so the
+    // stylesheet holds it in navy and only hands it over once there is a fill.
+    segEl.classList.add("is-measured");
+
+    // Sliding is enabled a frame after the fill first lands, so the control
+    // arrives already formed instead of growing out of the left edge.
+    if (!segEl.classList.contains("is-live")) {
+      requestAnimationFrame(function () { segEl.classList.add("is-live"); });
+    }
   }
 
   /* ---------- interactive dot grid (hero + CTA) ---------- */
@@ -353,7 +413,7 @@
 
   /* ---------- boot ---------- */
   function boot() {
-    renderPills();
+    buildPills();
     renderSections();
     document.querySelectorAll("[data-dotgrid]").forEach(initGrid);
 
