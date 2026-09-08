@@ -52,12 +52,84 @@ img { max-width: 100%; }
 }
 
 /* ===== HERO ===== */
-.iw-hero { position: relative; background: #fff; border-bottom: 1px solid var(--line); overflow: hidden; }
-.iw-hero canvas {
-  position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; display: block;
-  -webkit-mask-image: radial-gradient(ellipse 92% 96% at 50% 40%, #000 30%, transparent 84%);
-  mask-image: radial-gradient(ellipse 92% 96% at 50% 40%, #000 30%, transparent 84%);
+.iw-hero { position: relative; isolation: isolate; background: #fff; border-bottom: 1px solid var(--line); overflow: hidden; }
+
+/* ---- the ground, carried over from the branding page ----
+   One element per wash, moved by transform: separate clocks and separate
+   directions, so they drift apart and come back together rather than sliding
+   as one sheet. Pale on purpose — on a light ground anything stronger stops
+   reading as light and starts reading as decoration.
+
+   The layer is the height of the hero and the geometry is in percentages of
+   it, where the branding page could use pixels against a 620px hero. This one
+   is set by its own copy, so the composition scales to whatever height that
+   comes out at instead of being cut off square at the bottom edge. */
+.hero-wash {
+  position: absolute; top: 0; left: 0; right: 0; block-size: 100%;
+  z-index: -1; overflow: hidden; pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 52%, transparent 88%);
+  mask-image: linear-gradient(180deg, #000 0, #000 52%, transparent 88%);
 }
+.hero-wash span { position: absolute; left: 50%; will-change: transform; }
+/* green: opens top-left over the headline and runs down to the right */
+.hero-wash__g {
+  inline-size: 1015px; block-size: 134%; margin-left: -987px; top: -51%;
+  background: radial-gradient(closest-side ellipse at center, rgba(128,195,74,.24), rgba(128,195,74,0) 100%);
+  animation: washG 71s linear infinite;
+}
+/* brand blue: opens top-right and runs the other way */
+.hero-wash__b {
+  inline-size: 1090px; block-size: 147%; margin-left: -75px; top: -48%;
+  background: radial-gradient(closest-side ellipse at center, rgba(18,102,181,.21), rgba(18,102,181,0) 100%);
+  animation: washB 97s linear infinite;
+}
+/* sky: the low one, parked under the copy. Slowest and widest. */
+.hero-wash__s {
+  inline-size: 1170px; block-size: 139%; margin-left: -545px; top: 32%;
+  background: radial-gradient(closest-side ellipse at center, rgba(46,140,214,.21), rgba(46,140,214,0) 100%);
+  animation: washS 127s linear infinite;
+}
+/* A sheen crossing the surface, the way light moves over one. It rides inside
+   the wash layer so it fades out under the same mask as everything else. */
+.hero-wash::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(102deg,
+    rgba(255,255,255,0) 30%, rgba(255,255,255,.34) 50%, rgba(255,255,255,0) 70%);
+  background-repeat: no-repeat; background-size: 260% 100%;
+  animation: heroSheen 47s ease-in-out infinite;
+}
+/* Vertical only: each wash rises and falls in its own place and none of them
+   travels across the one beside it. Four waypoints read as something
+   wandering; the periods share no useful factor. */
+@keyframes washG {
+  0%   { transform: translate3d(0, 0, 0); }
+  25%  { transform: translate3d(0, 22%, 0); }
+  50%  { transform: translate3d(0, 6%, 0); }
+  75%  { transform: translate3d(0, -14%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes washB {
+  0%   { transform: translate3d(0, 0, 0); }
+  25%  { transform: translate3d(0, 26%, 0); }
+  50%  { transform: translate3d(0, -8%, 0); }
+  75%  { transform: translate3d(0, -24%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes washS {
+  0%   { transform: translate3d(0, 0, 0); }
+  25%  { transform: translate3d(0, -18%, 0); }
+  50%  { transform: translate3d(0, 10%, 0); }
+  75%  { transform: translate3d(0, 20%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes heroSheen {
+  0%, 100% { background-position: 124% 0; }
+  50%      { background-position: -24% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-wash span, .hero-wash::after { animation: none !important; }
+}
+
 .iw-hero .inner {
   position: relative; z-index: 2; padding: 64px 24px 56px;
   display: flex; flex-direction: column; align-items: center; text-align: center;
