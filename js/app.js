@@ -19,12 +19,18 @@
    No styling is written from here. The two properties app.js does set on an
    element are measurements — where the filter's fill goes and how wide it is,
    which depend on rendered label widths and cannot be known ahead of time.
-   What those numbers do is decided in css/styles.css. */
+   What those numbers do is decided in css/styles.css.
+
+   ES2015 bindings throughout: const unless a name is genuinely reassigned,
+   which is only the loop counters and a handful of pieces of mutable state.
+   The file stays wrapped in an IIFE rather than becoming a module — a module
+   would not load over file://, and opening index.html directly is how the
+   README says to run this. */
 (function () {
   "use strict";
 
   /* ---------- data ---------- */
-  var brandingData = {
+  const brandingData = {
     "Logos": [
       ["Financial brand identity", "Wordmark, monogram, and full identity system for a wealth firm."],
       ["Craft logo & marks", "Primary logo plus a flexible set of secondary brand marks."],
@@ -75,7 +81,7 @@
     ]
   };
 
-  var webData = {
+  const webData = {
     "Websites": [
       ["Product marketing site", "Multi-page site with homepage, pricing, and tours."],
       ["Corporate website", "Full corporate site with careers and newsroom."],
@@ -129,7 +135,7 @@
   // Social and ads: the work that runs in a feed or a placement rather than on
   // a site of its own. Split out of the web set, which keeps sites, landing
   // pages, UX/UI and the animation work.
-  var socialData = {
+  const socialData = {
     "Short video": [
       ["Short-form social video", "Edited promo reel with motion titles."],
       ["Testimonial edit", "Customer testimonial video edit."],
@@ -148,11 +154,12 @@
     ]
   };
 
-  var videoSubs = { "Motion graphics": 1, "Logo animation": 1, "Short video": 1, "Animated ads": 1 };
+  // The groups whose cards are video: they get a play badge and "Watch video".
+  const videoSubs = new Set(["Motion graphics", "Logo animation", "Short video", "Animated ads"]);
 
   // Real filenames extracted from the design bundle (extensions preserved).
   // Paths are relative to the repo root, where index.html lives.
-  var imageList = [
+  const imageList = [
     "assets/works/img01.jpg", "assets/works/img02.jpg", "assets/works/img03.webp", "assets/works/img04.webp", "assets/works/img05.jpg",
     "assets/works/img06.webp", "assets/works/img07.jpg", "assets/works/img08.jpg", "assets/works/img09.webp", "assets/works/img10.jpg",
     "assets/works/img11.jpg", "assets/works/img12.jpg", "assets/works/img13.jpg", "assets/works/img14.jpg", "assets/works/img15.jpg",
@@ -163,41 +170,41 @@
 
   /* ---------- build card sets (mirrors renderVals) ---------- */
   function buildCards(data) {
-    var out = [];
+    const out = [];
     Object.keys(data).forEach(function (s) {
       data[s].forEach(function (p) {
-        var play = !!videoSubs[s];
+        const play = videoSubs.has(s);
         out.push({ sub: s, title: p[0], desc: p[1], img: !play, play: play, cta: play ? "Watch video" : "View project" });
       });
     });
     return out;
   }
-  var brandingCardsAll = buildCards(brandingData);
-  var webCardsAll = buildCards(webData);
-  var socialCardsAll = buildCards(socialData);
+  const brandingCardsAll = buildCards(brandingData);
+  const webCardsAll = buildCards(webData);
+  const socialCardsAll = buildCards(socialData);
 
   // Scatter images so neighbours differ — identical formula to the source, and
   // walked in the same order, so splitting the social work off the web set left
   // every card with the image it already had.
-  var _gi = 0;
+  let _gi = 0;
   function assignImg(c) { c.image = imageList[(_gi * 7 + 3) % imageList.length]; _gi++; return c; }
   brandingCardsAll.forEach(assignImg);
   webCardsAll.forEach(assignImg);
   socialCardsAll.forEach(assignImg);
 
   // Interleave the three lists into one ungrouped grid.
-  var allCards = [];
-  var sets = [brandingCardsAll, webCardsAll, socialCardsAll];
-  var maxLen = Math.max(brandingCardsAll.length, webCardsAll.length, socialCardsAll.length);
-  for (var i = 0; i < maxLen; i++) {
-    for (var k = 0; k < sets.length; k++) {
+  const allCards = [];
+  const sets = [brandingCardsAll, webCardsAll, socialCardsAll];
+  const maxLen = Math.max(brandingCardsAll.length, webCardsAll.length, socialCardsAll.length);
+  for (let i = 0; i < maxLen; i++) {
+    for (let k = 0; k < sets.length; k++) {
       if (sets[k][i]) allCards.push(sets[k][i]);
     }
   }
 
   /* ---------- svg snippets ---------- */
-  var ARROW = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>';
-  var PLAY = '<svg width="20" height="20" viewBox="0 0 24 24" fill="#143C66"><path d="M7 4v16l13-8z"></path></svg>';
+  const ARROW = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>';
+  const PLAY = '<svg width="20" height="20" viewBox="0 0 24 24" fill="#143C66"><path d="M7 4v16l13-8z"></path></svg>';
 
   /* ---------- categories ----------
      One mark each, all drawn on the same 24px grid at the same weight: the
@@ -208,7 +215,7 @@
       'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ' +
       'aria-hidden="true">' + body + '</svg>';
   }
-  var CATS = [
+  const CATS = [
     { id: "all", label: "All work", icon: catIcon(
       '<rect x="3" y="3" width="7" height="7" rx="1.5"></rect>' +
       '<rect x="14" y="3" width="7" height="7" rx="1.5"></rect>' +
@@ -230,12 +237,12 @@
   ];
 
   /* ---------- state ---------- */
-  var state = { filter: "all" };
+  const state = { filter: "all" };
 
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
   function cardHTML(card) {
-    var play = card.play
+    const play = card.play
       ? '<div class="iw-play">' + PLAY + '</div>'
       : "";
     return '' +
@@ -259,26 +266,26 @@
            '</div>';
   }
 
-  var WORKS_INITIAL = 9;   // cards on first paint (3 rows)
-  var WORKS_STEP = 9;      // cards revealed per scroll batch — the stylesheet
+  const WORKS_INITIAL = 9;   // cards on first paint (3 rows)
+  const WORKS_STEP = 9;      // cards revealed per scroll batch — the stylesheet
                            // staggers the reveal off this, in .iw-card.reveal
-  var moreObserver = null; // watches the sentinel; torn down between renders
+  let moreObserver = null; // watches the sentinel; torn down between renders
 
   // Fill a works grid in batches, revealing more as the sentinel scrolls into view.
   function setupProgressive(host, cards) {
     if (moreObserver) { moreObserver.disconnect(); moreObserver = null; }
-    var grid = host.querySelector(".iw-grid");
-    var fade = host.querySelector("[data-fade]");
-    var sentinel = host.querySelector("[data-sentinel]");
+    const grid = host.querySelector(".iw-grid");
+    const fade = host.querySelector("[data-fade]");
+    const sentinel = host.querySelector("[data-sentinel]");
     if (!grid) return;
-    var shown = 0;
-    var tmp = document.createElement("div");
+    let shown = 0;
+    const tmp = document.createElement("div");
 
     function appendBatch(n) {
-      var end = Math.min(shown + n, cards.length);
-      for (var i = shown; i < end; i++) {
+      const end = Math.min(shown + n, cards.length);
+      for (let i = shown; i < end; i++) {
         tmp.innerHTML = cardHTML(cards[i]);
-        var card = tmp.firstChild;
+        const card = tmp.firstChild;
         // The stagger within a batch is the stylesheet's, off :nth-child —
         // every batch is WORKS_STEP long, so a card's place in its batch is
         // its place in the grid, counted in nines.
@@ -299,7 +306,7 @@
     if (shown < cards.length) {
       if ("IntersectionObserver" in window) {
         moreObserver = new IntersectionObserver(function (entries) {
-          for (var k = 0; k < entries.length; k++) {
+          for (let k = 0; k < entries.length; k++) {
             if (entries[k].isIntersecting) { appendBatch(WORKS_STEP); break; }
           }
         }, { rootMargin: "0px 0px 200px 0px" });
@@ -312,9 +319,9 @@
 
   // The tabs differ only in the cards they carry, so they share one shell.
   function renderSections() {
-    var host = document.getElementById("iw-sections");
-    var f = state.filter;
-    var cards = f === "branding" ? brandingCardsAll
+    const host = document.getElementById("iw-sections");
+    const f = state.filter;
+    const cards = f === "branding" ? brandingCardsAll
               : f === "web" ? webCardsAll
               : f === "social" ? socialCardsAll
               : allCards;
@@ -328,10 +335,10 @@
   /* ---------- filter: a segmented control ----------
      Built once and then only re-marked, so the fill slides from one segment to
      the next instead of being thrown away and redrawn in place. */
-  var segEl = null, segBtns = [];
+  let segEl = null, segBtns = [];
 
   function buildPills() {
-    var row = document.getElementById("iw-filter-row");
+    const row = document.getElementById("iw-filter-row");
     if (!row) return;
 
     row.innerHTML =
@@ -344,11 +351,11 @@
       '</div>';
 
     segEl = row.querySelector(".iw-seg");
-    segBtns = Array.prototype.slice.call(row.querySelectorAll(".iw-seg__btn"));
+    segBtns = Array.from(row.querySelectorAll(".iw-seg__btn"));
 
     segBtns.forEach(function (btn) {
       btn.addEventListener("click", function () {
-        var id = btn.getAttribute("data-cat");
+        const id = btn.getAttribute("data-cat");
         if (id === state.filter) return;
         state.filter = id;
         markPills();
@@ -365,7 +372,7 @@
     // segments catches the reflow when the font arrives — document.fonts.ready
     // does not, since it can resolve before the face is even requested.
     if (window.ResizeObserver) {
-      var ro = new ResizeObserver(moveFill);
+      const ro = new ResizeObserver(moveFill);
       ro.observe(segEl);
       segBtns.forEach(function (b) { ro.observe(b); });
     } else if (document.fonts && document.fonts.ready) {
@@ -375,7 +382,7 @@
 
   function markPills() {
     segBtns.forEach(function (btn) {
-      var on = btn.getAttribute("data-cat") === state.filter;
+      const on = btn.getAttribute("data-cat") === state.filter;
       btn.classList.toggle("is-on", on);
       btn.setAttribute("aria-pressed", on ? "true" : "false");
     });
@@ -386,7 +393,7 @@
   // width the stylesheet could know: the labels are different lengths.
   function moveFill() {
     if (!segEl) return;
-    var on = segEl.querySelector(".iw-seg__btn.is-on");
+    const on = segEl.querySelector(".iw-seg__btn.is-on");
     if (!on) return;
     segEl.style.setProperty("--fill-x", on.offsetLeft + "px");
     segEl.style.setProperty("--fill-w", on.offsetWidth + "px");
@@ -403,15 +410,15 @@
 
   /* ---------- interactive dot grid (hero + CTA) ---------- */
   function initGrid(host) {
-    var cv = host.querySelector("canvas");
+    const cv = host.querySelector("canvas");
     if (!cv) return;
-    var ctx = cv.getContext("2d");
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    var GAP = 30, R = 190, MAXPUSH = 30;
-    var w = 0, h = 0, mx = -9999, my = -9999, strength = 0, target = 0, raf = 0;
+    const ctx = cv.getContext("2d");
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const GAP = 30, R = 190, MAXPUSH = 30;
+    let w = 0, h = 0, mx = -9999, my = -9999, strength = 0, target = 0;
 
     function resize() {
-      var r = host.getBoundingClientRect();
+      const r = host.getBoundingClientRect();
       w = r.width; h = r.height;
       cv.width = Math.round(w * dpr);
       cv.height = Math.round(h * dpr);
@@ -419,23 +426,23 @@
     }
     function draw() {
       ctx.clearRect(0, 0, w, h);
-      for (var y = GAP / 2; y < h; y += GAP) {
-        for (var x = GAP / 2; x < w; x += GAP) {
-          var px = x, py = y, ff = 0;
+      for (let y = GAP / 2; y < h; y += GAP) {
+        for (let x = GAP / 2; x < w; x += GAP) {
+          let px = x, py = y, ff = 0;
           if (strength > 0.01) {
-            var dx = x - mx, dy = y - my, d = Math.hypot(dx, dy);
+            const dx = x - mx, dy = y - my, d = Math.hypot(dx, dy);
             if (d < R) {
               ff = 1 - d / R;
-              var inv = d || 1, push = ff * MAXPUSH * strength;
+              const inv = d || 1, push = ff * MAXPUSH * strength;
               px = x + (dx / inv) * push;
               py = y + (dy / inv) * push;
             }
           }
-          var e = ff * strength;
-          var eased = e * e * (3 - 2 * e);
-          var cr = (52 + 76 * eased) | 0;
-          var cg = (92 + 103 * eased) | 0;
-          var cb = (134 - 60 * eased) | 0;
+          const e = ff * strength;
+          const eased = e * e * (3 - 2 * e);
+          const cr = (52 + 76 * eased) | 0;
+          const cg = (92 + 103 * eased) | 0;
+          const cb = (134 - 60 * eased) | 0;
           ctx.beginPath();
           ctx.fillStyle = "rgba(" + cr + "," + cg + "," + cb + "," + (0.16 + eased * 0.3) + ")";
           ctx.arc(px, py, Math.max(1.0, 1.9 - eased * 0.9), 0, 6.2832);
@@ -444,14 +451,20 @@
       }
     }
     host.addEventListener("mousemove", function (ev) {
-      var r = host.getBoundingClientRect();
+      const r = host.getBoundingClientRect();
       mx = ev.clientX - r.left; my = ev.clientY - r.top; target = 1;
     }, { passive: true });
     host.addEventListener("mouseleave", function () { target = 0; }, { passive: true });
     window.addEventListener("resize", resize, { passive: true });
     resize();
-    (function loop() { strength += (target - strength) * 0.08; draw(); raf = requestAnimationFrame(loop); })();
-    void raf;
+    // Runs for the life of the page; the frame id was kept only to be
+    // discarded, since nothing ever cancels it.
+    const loop = () => {
+      strength += (target - strength) * 0.08;
+      draw();
+      requestAnimationFrame(loop);
+    };
+    loop();
   }
 
   /* ---------- boot ---------- */
