@@ -144,7 +144,15 @@ img { max-width: 100%; }
 /* Set as the branding page sets its hero: the same clamp, leading and
    tracking. Its copy runs at 18px over 1.75 against a 720px measure. */
 .iw-hero h1 { margin: 0; font-weight: 800; font-size: var(--step-3); line-height: 1.12; letter-spacing: -.8px; color: var(--blue); }
-.iw-hero p { margin: 16px 0 0; max-width: 720px; font-weight: 400; font-size: var(--step-1); line-height: 1.75; color: var(--muted); }
+/* balance evens the two lines out. Left to normal wrapping the first ran the
+   full measure and the second held four words, which under a centred headline
+   reads as a mistake rather than a shape. Where it isn't supported the text
+   simply wraps as before. */
+.iw-hero p {
+  margin: 16px 0 0; max-width: 720px;
+  font-weight: 400; font-size: var(--step-1); line-height: 1.75; color: var(--muted);
+  text-wrap: balance;
+}
 
 /* ===== FILTER: SEGMENTED CONTROL =====
    The row is transparent, like the hero and the sections: the wash is behind
@@ -180,12 +188,21 @@ img { max-width: 100%; }
      anything that reaches past it */
   box-shadow: 0 1px 3px rgba(20,60,102,.28);
   pointer-events: none;
+  transition: background .25s ease, box-shadow .25s ease;
 }
 /* The first placement is a jump, not a move: the fill starts at no width, and
    growing into position would read as the control assembling itself. app.js
    turns the sliding on a frame later, once it is already under a segment. */
 .iw-seg.is-live .iw-seg__fill {
-  transition: transform .44s cubic-bezier(.2,.7,.3,1), width .44s cubic-bezier(.2,.7,.3,1);
+  transition: transform .44s cubic-bezier(.2,.7,.3,1), width .44s cubic-bezier(.2,.7,.3,1),
+              background .25s ease, box-shadow .25s ease;
+}
+/* Hovering the chosen segment answers on the fill itself — it cannot be
+   reached from the segment, which is a later sibling, so the track is asked
+   whether it holds a hovered active segment. */
+.iw-seg:has(.iw-seg__btn.is-on:hover) .iw-seg__fill {
+  background: #1a5089;
+  box-shadow: 0 3px 10px rgba(20,60,102,.34);
 }
 
 .iw-seg__btn {
@@ -194,12 +211,21 @@ img { max-width: 100%; }
   appearance: none; -webkit-appearance: none; border: 0; background: transparent;
   height: 44px; padding: 0 20px; border-radius: 10px; cursor: pointer;
   font: inherit; font-size: var(--step-sm); font-weight: 600; white-space: nowrap;
-  color: var(--muted); transition: color .3s ease;
+  color: var(--muted);
+  transition: color .3s ease, background-color .25s ease, transform .18s ease;
 }
 /* The mark takes the label's colour, so it turns with it when the fill
    arrives underneath. */
-.iw-seg__icon { display: block; flex-shrink: 0; }
+.iw-seg__icon { display: block; flex-shrink: 0; transition: transform .3s cubic-bezier(.2,.7,.3,1); }
+
+/* Hover on a segment that is not chosen: the ground it would take shows
+   faintly, so the pointer is answered by the shape the fill would land in
+   rather than by the label alone. The mark lifts with it. */
 .iw-seg__btn:hover { color: var(--navy); }
+.iw-seg__btn:not(.is-on):hover { background-color: rgba(20,60,102,.07); }
+.iw-seg__btn:hover .iw-seg__icon { transform: translateY(-1px) scale(1.09); }
+.iw-seg__btn:active { transform: scale(.97); }
+
 /* Until app.js has measured, the fill has no width: the active label stays
    navy so it is never white on nothing. */
 .iw-seg__btn.is-on { color: var(--navy); font-weight: 700; }
@@ -207,7 +233,11 @@ img { max-width: 100%; }
 .iw-seg__btn:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .iw-seg.is-live .iw-seg__fill { transition: none; }
+  /* The colour and the tint stay — they are states, not motion. What goes is
+     everything that moves: the slide, the lift and the press. */
+  .iw-seg.is-live .iw-seg__fill { transition: transform 0s, width 0s, background .25s ease, box-shadow .25s ease; }
+  .iw-seg__btn, .iw-seg__icon { transition: color .3s ease, background-color .25s ease; }
+  .iw-seg__btn:hover .iw-seg__icon, .iw-seg__btn:active { transform: none; }
 }
 
 /* ===== SECTIONS =====
