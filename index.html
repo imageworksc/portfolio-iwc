@@ -8,7 +8,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="src/styles.css">
+  <!-- Versioned on purpose. Pages serves both this file and the stylesheet with
+       Cache-Control: max-age=600, and a browser can hold one while it refetches
+       the other. When markup and CSS change together — a renamed class, say —
+       ten minutes of that mismatch renders the page unstyled. Bump ?v= with any
+       change that markup and CSS have to make in step. -->
+  <link rel="stylesheet" href="src/styles.css?v=2">
 </head>
 <body>
 
@@ -130,6 +135,6 @@
     <div style="height:50px;"></div>
   </footer>
 
-  <script src="src/app.js"></script>
+  <script src="src/app.js?v=2"></script>
 </body>
 </html>
