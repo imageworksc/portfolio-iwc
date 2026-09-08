@@ -375,8 +375,8 @@ img { max-width: 100%; }
 
 /* ===== CTA =====
    The branding page's closing band, tone for tone: its gradient, its white
-   copy over a pale blue lead, its green eyebrow with the dot before it, and
-   its 58px button. The one thing not carried over is the alignment — that
+   copy over a pale blue lead, its dot field and its 58px button, down to
+   having no eyebrow. The one thing not carried over is the alignment — that
    page is left-ranged throughout and this one is centred, from the headline
    down to the grid, so the band stays centred with it. */
 .iw-cta {
@@ -386,28 +386,19 @@ img { max-width: 100%; }
   color: #fff;
   text-align: center;
 }
-/* The dot field over the gradient is the same motif, kept on the canvas that
-   was already here so it still answers the cursor. At rest it draws exactly
-   what the branding page lays down in CSS: white at .07, 1px, every 24px.
-
-   It used to be masked to an ellipse, fading out towards the edges — that was
-   for the white band, where a field running into the corners had nothing to
-   sit against. On the gradient the reference carries its dots evenly to every
-   edge, so the mask goes. */
-.iw-cta canvas {
-  position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; display: block;
+/* The dot field, laid down exactly as the reference lays it: white at .07, a
+   1px dot every 24px, even to every edge. It was a canvas that answered the
+   cursor, but the reaction was too faint on this ground to read as anything —
+   so it is static, and the canvas and the code behind it are gone. */
+.iw-cta::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: radial-gradient(rgba(255,255,255,.07) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 .iw-cta .inner { position: relative; z-index: 2; }
-.iw-cta .eyebrow {
-  display: inline-flex; align-items: center; gap: 9px;
-  font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase;
-  color: var(--green);
-}
-.iw-cta .eyebrow::before {
-  content: ''; inline-size: 8px; block-size: 8px; border-radius: 50%;
-  background: var(--green); flex: none;
-}
-.iw-cta h2 { margin: 16px 0 0; font-weight: 800; font-size: var(--step-2); line-height: 1.15; letter-spacing: -.5px; color: #fff; }
+/* The heading opens the band now that the eyebrow is gone, so it carries no
+   top margin — as on the reference, which has no eyebrow either. */
+.iw-cta h2 { margin: 0; font-weight: 800; font-size: var(--step-2); line-height: 1.15; letter-spacing: -.5px; color: #fff; }
 .iw-cta p { margin: 16px auto 0; max-width: 720px; font-weight: 400; font-size: var(--step-1); line-height: 1.75; color: rgba(226,238,252,.82); }
 .iw-cta .cta-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 11px;

@@ -16,7 +16,7 @@ index.html          # the page: hero, filter, grid mount, closing band
 css/
 └── styles.css      # every rule — tokens, wash, hero, filter, cards, responsive
 js/
-└── app.js          # the work data, the filter, the progressive grid, the canvas dot-grid
+└── app.js          # the work data, the filter, and the progressive grid
 assets/
 ├── logo.svg, footer-logo.png, map.png   # unreferenced since the nav and footer came out
 └── works/          # img01–30 project imagery
@@ -37,9 +37,9 @@ mismatch renders the page unstyled. Bump `?v=` with any change the two make in s
 - **Category filter** — a segmented control over `All work` / `Branding` / `Web` / `Social and Ads`, with a fill that slides to the chosen one.
 - **Interleaved "All work" grid** — the three sets mixed via the source's image-scatter formula.
 - **Progressive grid** — nine cards on first paint, nine more each time the sentinel scrolls into view, each batch revealing on a stagger.
-- **Hover cards** — image desaturates and a frosted-glass panel reveals the title + CTA; video work shows a play badge.
+- **Hover cards** — the image turns to greyscale and a navy panel reveals the title + CTA; video work shows a play badge.
 - **Page wash** — three drifting washes of brand colour behind the top of the page, carried over from the branding page.
-- **Interactive canvas dot-grid** — the closing band's background reacts to the cursor.
+- **Closing band** — the branding page's CTA: its gradient, its static dot field, its 58px button.
 - **Responsive** — 3 → 2 → 1 column grid; the filter tightens twice and scrolls sideways below that.
 
 ## Running
