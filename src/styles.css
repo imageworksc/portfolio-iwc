@@ -151,22 +151,62 @@ img { max-width: 100%; }
 .iw-hero h1 { margin: 0; font-weight: 800; font-size: 52px; line-height: 56px; letter-spacing: -1.2px; color: var(--blue); }
 .iw-hero p { margin: 14px 0 0; max-width: 640px; font-weight: 400; font-size: 16.5px; line-height: 25.58px; color: var(--muted); }
 
-/* ===== FILTER PILLS ===== */
-/* Transparent, like the hero and the sections: the wash is behind all three,
-   and a white ground here would cut it off at the fold. */
+/* ===== FILTER: SEGMENTED CONTROL =====
+   The row is transparent, like the hero and the sections: the wash is behind
+   all three, and a white ground here would cut it off at the fold. The control
+   itself is the one surface that sits on top of the colour, so it is a frosted
+   white rather than a solid one — the wash still reads underneath it.
+
+   Four segments in one track, with a single fill that slides to whichever is
+   chosen. The fill is placed from measurement in app.js, because the labels
+   are different lengths and no stylesheet can know where it belongs. */
 .iw-filter { padding: 44px 16px 8px; }
-.iw-filter-row { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
-.iw-tab {
-  display: flex; align-items: center; gap: 9px; border-radius: 8px; font-weight: 700;
-  background: #fff; border: none; cursor: pointer; white-space: nowrap;
-  transition: box-shadow .35s ease, color .3s ease, transform .3s ease,
-    height .4s cubic-bezier(.2,.7,.3,1), padding .4s cubic-bezier(.2,.7,.3,1),
-    font-size .4s cubic-bezier(.2,.7,.3,1), opacity .35s ease;
+.iw-filter-row { display: flex; justify-content: center; }
+
+.iw-seg {
+  position: relative; display: inline-flex; align-items: center; gap: 2px;
+  max-width: 100%; padding: 5px; border-radius: 14px;
+  background: rgba(255,255,255,.66);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  box-shadow: inset 0 0 0 1px rgba(20,60,102,.10), 0 2px 10px rgba(9,40,80,.05);
+  /* narrow screens: the track scrolls rather than breaking into two rows */
+  overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
 }
-.iw-tab:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 12px 24px rgba(20,60,102,0.24) !important; }
-.iw-tab:active { transform: translateY(0) scale(.98); }
-.iw-tab.on { color: var(--navy); opacity: 1; height: 54px; padding: 0 30px; font-size: 17px; box-shadow: inset 0 0 0 1px var(--navy); }
-.iw-tab.off { color: rgb(107,124,142); opacity: .55; height: 42px; padding: 0 20px; font-size: 14.5px; box-shadow: inset 0 0 0 1px rgba(20,60,102,0.1); }
+.iw-seg::-webkit-scrollbar { display: none; }
+
+.iw-seg__fill {
+  position: absolute; top: 5px; bottom: 5px; left: 0;
+  width: var(--fill-w, 0); transform: translateX(var(--fill-x, 0));
+  border-radius: 10px; background: var(--navy);
+  /* kept inside the track's 5px padding: the scroll fallback below clips
+     anything that reaches past it */
+  box-shadow: 0 1px 3px rgba(20,60,102,.28);
+  pointer-events: none;
+}
+/* The first placement is a jump, not a move: the fill starts at no width, and
+   growing into position would read as the control assembling itself. app.js
+   turns the sliding on a frame later, once it is already under a segment. */
+.iw-seg.is-live .iw-seg__fill {
+  transition: transform .44s cubic-bezier(.2,.7,.3,1), width .44s cubic-bezier(.2,.7,.3,1);
+}
+
+.iw-seg__btn {
+  position: relative; z-index: 1; flex: 0 0 auto;
+  appearance: none; -webkit-appearance: none; border: 0; background: transparent;
+  height: 44px; padding: 0 22px; border-radius: 10px; cursor: pointer;
+  font: inherit; font-size: 15px; font-weight: 600; white-space: nowrap;
+  color: var(--muted); transition: color .3s ease;
+}
+.iw-seg__btn:hover { color: var(--navy); }
+/* Until app.js has measured, the fill has no width: the active label stays
+   navy so it is never white on nothing. */
+.iw-seg__btn.is-on { color: var(--navy); font-weight: 700; }
+.iw-seg.is-measured .iw-seg__btn.is-on { color: #fff; }
+.iw-seg__btn:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .iw-seg.is-live .iw-seg__fill { transition: none; }
+}
 
 /* ===== SECTIONS =====
    Every tab renders the same shell now that nothing stands between the filter
@@ -297,4 +337,17 @@ img { max-width: 100%; }
   .iw-footer { padding: 64px 24px 0; }
   .iw-foot-menus { grid-template-columns: 1fr 1fr; }
   .iw-cta h2 { font-size: 30px; line-height: 1.15; }
+}
+@media (max-width: 560px) {
+  /* Four segments in one track: tighten them so the whole control still fits a
+     phone. "Social and Ads" is the one that decides it — the other three are
+     short. Below the narrowest of these the track scrolls sideways on its own
+     rather than breaking into two rows, which the sliding fill could not
+     follow. */
+  .iw-seg__btn { height: 40px; padding: 0 14px; font-size: 13.5px; }
+}
+@media (max-width: 420px) {
+  .iw-seg { gap: 0; padding: 4px; }
+  .iw-seg__fill { top: 4px; bottom: 4px; }
+  .iw-seg__btn { height: 38px; padding: 0 10px; font-size: 12.5px; }
 }
