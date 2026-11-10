@@ -82,7 +82,7 @@
 
   const webData = {
     "Websites": [
-      ["Crown Point homepage", "Homepage design and build for Crown Point.", "https://imageworksc.github.io/crown-point-homepage/#top"],
+      ["Crown Point homepage", "Homepage for a St. Petersburg general contractor.", "https://imageworksc.github.io/crown-point-homepage/#top", "assets/works/crown-point.jpg"],
       ["Product marketing site", "Multi-page site with homepage, pricing, and tours."],
       ["Corporate website", "Full corporate site with careers and newsroom."],
       ["E-commerce storefront", "Conversion-focused storefront and product pages."],
@@ -174,8 +174,8 @@
     Object.keys(data).forEach(function (s) {
       data[s].forEach(function (p) {
         const play = videoSubs.has(s);
-        // An optional third entry is the live project's URL.
-        out.push({ sub: s, title: p[0], desc: p[1], url: p[2], img: !play, play: play, cta: play ? "Watch video" : "View project" });
+        // Optional third and fourth entries: the live project's URL and its own screenshot.
+        out.push({ sub: s, title: p[0], desc: p[1], url: p[2], image: p[3], img: !play, play: play, cta: play ? "Watch video" : "View project" });
       });
     });
     return out;
@@ -188,7 +188,9 @@
   // walked in the same order, so splitting the social work off the web set left
   // every card with the image it already had.
   let _gi = 0;
-  function assignImg(c) { c.image = imageList[(_gi * 7 + 3) % imageList.length]; _gi++; return c; }
+  // A card with its own screenshot keeps it and takes no slot, so the
+  // placeholder cards keep the images they had.
+  function assignImg(c) { if (c.image) return c; c.image = imageList[(_gi * 7 + 3) % imageList.length]; _gi++; return c; }
   brandingCardsAll.forEach(assignImg);
   webCardsAll.forEach(assignImg);
   socialCardsAll.forEach(assignImg);
