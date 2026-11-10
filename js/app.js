@@ -82,6 +82,7 @@
 
   const webData = {
     "Websites": [
+      ["Crown Point homepage", "Homepage design and build for Crown Point.", "https://imageworksc.github.io/crown-point-homepage/#top"],
       ["Product marketing site", "Multi-page site with homepage, pricing, and tours."],
       ["Corporate website", "Full corporate site with careers and newsroom."],
       ["E-commerce storefront", "Conversion-focused storefront and product pages."],
@@ -173,7 +174,8 @@
     Object.keys(data).forEach(function (s) {
       data[s].forEach(function (p) {
         const play = videoSubs.has(s);
-        out.push({ sub: s, title: p[0], desc: p[1], img: !play, play: play, cta: play ? "Watch video" : "View project" });
+        // An optional third entry is the live project's URL.
+        out.push({ sub: s, title: p[0], desc: p[1], url: p[2], img: !play, play: play, cta: play ? "Watch video" : "View project" });
       });
     });
     return out;
@@ -251,7 +253,10 @@
         '</div>' +
         '<div class="iw-panel">' +
           '<div class="iw-panel-title">' + esc(card.title) + '</div>' +
-          '<a class="iw-panel-cta" href="#">' + esc(card.cta || "View More") + ARROW + '</a>' +
+          (card.url
+            ? '<a class="iw-panel-cta" href="' + esc(card.url) + '" target="_blank" rel="noopener">'
+            : '<a class="iw-panel-cta" href="#">') +
+            esc(card.cta || "View More") + ARROW + '</a>' +
         '</div>' +
       '</div>';
   }
