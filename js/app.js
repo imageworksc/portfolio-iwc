@@ -167,6 +167,23 @@
     "assets/works/img26.webp", "assets/works/img27.webp", "assets/works/img28.jpg", "assets/works/img29.png", "assets/works/img30.jpg"
   ];
 
+  // The real work: one page per project, each with the site itself running
+  // inside it, served from the individual-portfolio repo. Title, line, the
+  // page, and a screenshot of the site's homepage. Listed in the order the
+  // pages' own "Next project" links walk them.
+  const PROJECT_PAGES = "https://imageworksc.github.io/individual-portfolio/";
+  const projects = [
+    ["Crown Point Construction", "Homepage for a St. Petersburg general contractor.", "option-9.html", "assets/works/crown-point.jpg"],
+    ["Atlantic Sun Control", "Homepage for a window film installer.", "atlantic-sun-control.html", "assets/works/atlantic-sun-control.jpg"],
+    ["Silk Vision", "Ziplyft and entropion pages for an eye surgery center.", "silk-vision.html", "assets/works/silk-vision.jpg"],
+    ["Casey Margenau", "Homepage for a luxury real estate agent.", "casey-margenau.html", "assets/works/casey-margenau.jpg"],
+    ["Mason Dixon", "Homepage for an animal emergency hospital.", "mason-dixon.html", "assets/works/mason-dixon.jpg"],
+    ["Highbrow Magazine", "Homepage for an arts and culture magazine.", "highbrow-magazine.html", "assets/works/highbrow-magazine.jpg"],
+    ["Barr Group", "Homepage for an expert witness firm.", "barr-group.html", "assets/works/barr-group.jpg"],
+    ["WSSA", "Homepage for the Wine & Spirits Shippers Association.", "wssa.html", "assets/works/wssa.jpg"],
+    ["St. Michael’s", "Homepage for a back office services firm.", "st-michaels.html", "assets/works/st-michaels.jpg"]
+  ];
+
   /* ---------- build card sets (mirrors renderVals) ---------- */
   function buildCards(data) {
     const out = [];
@@ -178,21 +195,26 @@
     });
     return out;
   }
+  const projectCards = projects.map(function (p) {
+    return { sub: "Websites", title: p[0], desc: p[1], url: PROJECT_PAGES + p[2], image: p[3], img: true, play: false, cta: "View project" };
+  });
   const brandingCardsAll = buildCards(brandingData);
   const webCardsAll = buildCards(webData);
   const socialCardsAll = buildCards(socialData);
 
   // Scatter images so neighbours differ — identical formula to the source, and
   // walked in the same order, so splitting the social work off the web set left
-  // every card with the image it already had.
+  // every card with the image it already had. The projects bring their own
+  // screenshots, and are added after this so they take no slot.
   let _gi = 0;
   function assignImg(c) { c.image = imageList[(_gi * 7 + 3) % imageList.length]; _gi++; return c; }
   brandingCardsAll.forEach(assignImg);
   webCardsAll.forEach(assignImg);
   socialCardsAll.forEach(assignImg);
 
-  // Interleave the three lists into one ungrouped grid.
-  const allCards = [];
+  // Interleave the three lists into one ungrouped grid, with the projects
+  // ahead of it.
+  const allCards = projectCards.slice();
   const sets = [brandingCardsAll, webCardsAll, socialCardsAll];
   const maxLen = Math.max(brandingCardsAll.length, webCardsAll.length, socialCardsAll.length);
   for (let i = 0; i < maxLen; i++) {
@@ -200,6 +222,8 @@
       if (sets[k][i]) allCards.push(sets[k][i]);
     }
   }
+  // and ahead of the web set's own cards
+  webCardsAll.unshift.apply(webCardsAll, projectCards);
 
   /* ---------- svg snippets ---------- */
   const ARROW = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>';
@@ -247,11 +271,11 @@
     return '' +
       '<div class="iw-card">' +
         '<div class="img">' +
-          '<img src="' + card.image + '" alt="" loading="lazy">' + play +
+          '<img src="' + card.image + '" alt="' + (card.url ? esc(card.title) + ' homepage' : '') + '" loading="lazy">' + play +
         '</div>' +
         '<div class="iw-panel">' +
           '<div class="iw-panel-title">' + esc(card.title) + '</div>' +
-          '<a class="iw-panel-cta" href="#">' + esc(card.cta || "View More") + ARROW + '</a>' +
+          '<a class="iw-panel-cta" href="' + esc(card.url || "#") + '">' + esc(card.cta || "View More") + ARROW + '</a>' +
         '</div>' +
       '</div>';
   }
