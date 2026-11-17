@@ -176,7 +176,7 @@
     ["Crown Point Construction", "Homepage for a St. Petersburg general contractor.", "option-9.html", "assets/works/crown-point.jpg"],
     ["Atlantic Sun Control", "Homepage for a window film installer.", "atlantic-sun-control.html", "assets/works/atlantic-sun-control.jpg"],
     ["Silk Vision", "Ziplyft and entropion pages for an eye surgery center.", "silk-vision.html", "assets/works/silk-vision.jpg"],
-    ["Casey Margenau", "Homepage for a luxury real estate agent.", "casey-margenau.html", "assets/works/casey-margenau.jpg"],
+    ["Casey Margenau", "Homepage for a luxury real estate agent.", "casey-margenau.html", "assets/works/casey-margenau.jpg?v=2"],
     ["Mason Dixon", "Homepage for an animal emergency hospital.", "mason-dixon.html", "assets/works/mason-dixon.jpg"],
     ["Highbrow Magazine", "Homepage for an arts and culture magazine.", "highbrow-magazine.html", "assets/works/highbrow-magazine.jpg"],
     ["Barr Group", "Homepage for an expert witness firm.", "barr-group.html", "assets/works/barr-group.jpg"],
